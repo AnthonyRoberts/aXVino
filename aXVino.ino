@@ -77,7 +77,10 @@ void setup()
     if (ledPins[i] > 0) {
       digitalWrite(ledPins[i], ledState[i]);
     }
-  }  
+  }
+  
+// Initiate serial connection to the RN-XV  
+  WiFly.begin(9600);
 }
 
 
@@ -89,15 +92,15 @@ void loop()
 
 // Any data from the RN-XV waiting to be processed?
   if (WiFly.available()) {
-    
 // The peek function has a look at the data in the buffer (but doesn't actually read it)
     if (WiFly.peek() == '!') {  // An instruction is on its way
       delay(100);               // Allow time for the rest of the instruction to arrive
+      WiFly.read();             // Get rid of the ! - it's served its purpose
       instruc = WiFly.read();   // eg. H for Set High on LED
-      param1 = WiFly.read();    // First parameter - usually the LED number
-      param2 = WiFly.read();    // Second parameter
-      param3 = WiFly.read();    // Third parameter
-      param4 = WiFly.read();    // Fourth parameter
+      param1  = WiFly.read();    // First parameter - usually the LED number
+      param2  = WiFly.read();    // Second parameter
+      param3  = WiFly.read();    // Third parameter
+      param4  = WiFly.read();    // Fourth parameter
       
 // We've read the instruction, now let's see which one it was and act accordingly      
       switch (instruc) {
@@ -154,6 +157,7 @@ void loop()
       }
       return;
     }
+    WiFly.read();      // Remove the character from the buffer and discard it. Don't know what is was.
   }
 }
 
